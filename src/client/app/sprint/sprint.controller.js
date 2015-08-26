@@ -5,9 +5,9 @@
 		.module('app.sprint')
 		.controller('SprintController', SprintController);
 
-	SprintController.$inject = ['$filter','sprintManager', 'logger', '$state', '$stateParams', 'Sprint', 'STATUSES', 'SPRINT_DURATIONS', '$scope', '$modal'];
+	SprintController.$inject = ['$filter','sprintManager', 'logger', '$state', '$stateParams', 'Sprint', 'STATUSES', 'SPRINT_DURATIONS', '$scope', '$modal', 'taskManager'];
 	/* @ngInject */
-	function SprintController($filter,sprintManager, logger ,$state, $stateParams, Sprint, STATUSES, SPRINT_DURATIONS, $scope,$modal) {
+	function SprintController($filter,sprintManager, logger ,$state, $stateParams, Sprint, STATUSES, SPRINT_DURATIONS, $scope,$modal,taskManager) {
 		var vm = this;
 
 		var _sprint = null;
@@ -16,6 +16,7 @@
 
 		vm.selectTaskModal = selectTaskModal;
 
+		var tasks = taskManager.getAll();
 
 
 		activate($stateParams.sprintId);
@@ -84,13 +85,38 @@
 		//Open a op up for user to select/unselect task
 		function selectTaskModal(){
 			
+			var tasksToDisplay = [];
 
+			//Display only available tasks (free and the one the sprint have)
+			angular.forEach(tasks,function(task){
+				if(!task.isAssignedToSprint()){
+					tasksToDisplay.push(task);
+				}
+				if (task.isAssignedToSprintId(vm.sprint.id)){
+					tasksToDisplay.push(task);
+				}
+			});
+								
+			//Mark task as selected
+			angular.forEach(tasksToDisplay,function(task){
+				for(var i = 0 ; i < vm.sprint.tasks.length; i++){
+					if(task.id == vm.sprint.tasks[i].id){
+						task.isSelected = true;
+					}
+				};	
+			});
+			
+			console.log(tasksToDisplay);
+			
+
+			
 			var config = {
-				entity : vm.sprint,
+				entity : angular.copy(vm.sprint),
 				modalTitle : 'Select task for '+vm.sprint.title,
 				modalAction : 'Update',
 				actionTitle : 'Sprint updated',
 				isNew : true,
+				tasks : tasksToDisplay,
 			};
 			
 			var modalTemplate = {
@@ -109,30 +135,30 @@
 			modalInstance.result.then(accept, refuse);
 
 			function accept(tasksSelected){
+				console.log('selected:');
+				console.log(tasksSelected);
 				vm.sprint.tasks =  tasksSelected;
 			}
 
 			function refuse(){
 				console.log('modal dismissed');
 			}
-				
-			function upsertSprint(sprint){
-				var actionTitle = (sprint.id) ? 'Sprint update' : 'Sprint add';
+		}
+		
+		function upsertSprint(sprint){
+			var actionTitle = (sprint.id) ? 'Sprint update' : 'Sprint add';
 
-				
-				//!\ TODO HANDLE TASKS UPDATE
-				
-				sprintManager.upsert(sprint).then(onSuccess, onFailure);
+			//!\ TODO HANDLE TASKS UPDATE
+			sprintManager.upsert(sprint).then(onSuccess, onFailure);
 
-				function onSuccess(){
-					logger.success('Sprint n° '+sprint.numero,sprint,actionTitle);
-					vm.isNew=false;
-					vm.formEdit.$cancel();
-				}
-
-				function onFailure(reason){
-				logger.error('Sprint n° '+sprint.numero,reason,actionTitle+' fail');
+			function onSuccess(sprint){
+				logger.success('Sprint n° '+sprint.numero,sprint,actionTitle);
+				vm.isNew=false;
+				vm.formEdit.$cancel();
 			}
+
+			function onFailure(reason){
+				logger.error('Sprint n° '+sprint.numero,reason,actionTitle+' fail');
 			}
 		}
 	}
