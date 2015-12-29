@@ -20,25 +20,16 @@
 
   <base href="/">
 
-  <link rel="stylesheet" href="styles/lib-750a82b425.css">
+  <link rel="stylesheet" href="styles/lib-86b8bcd948.css">
 
-  <link rel="stylesheet" href="styles/app-23fd9aff82.css">
+  <link rel="stylesheet" href="styles/app-324de25e96.css">
 </head>
-<body ng-cloak >
-  <div style="height:100%" ng-include="'app/layout/shell.html'"></div>
-  <div id="splash-page" ng-show="showSplash">
-    <div class="page-splash">
-      <div class="page-splash-message">
-        Membership Manager
-      </div>
-      <div class="progress progress-striped active page-progress-bar">
-        <div class="bar"></div>
-      </div>
-    </div>
-  </div>
-  <script src="js/lib-62ab02bce8.js"></script>
+<body layout="row" ng-cloak >
+  <div flex layout="row" ng-include="'app/layout/shell.html'"></div>
 
-  <script src="js/app-2147e1a4af.js"></script>
+  <script src="js/lib-f0e0d20ff4.js"></script>
+
+  <script src="js/app-779b4854bb.js"></script>
 
   <script type="text/javascript">
     angular
@@ -61,6 +52,11 @@
               .icon("search"      , "./assets/svg/search.svg"       , 24)
               .icon("edit"      , "./assets/svg/edit.svg"       , 24)
               .icon("add"      , "./assets/svg/add.svg"       , 24)
+              .icon("clear"      , "./assets/svg/clear.svg"       , 24)
+              .icon("addSession"      , "./assets/svg/addSession.svg"       , 24)
+              .icon("addSeance"      , "./assets/svg/addSeance.svg"       , 24)
+              .icon("addPhoto"      , "./assets/svg/addPhoto.svg"       , 24)
+              .icon("close"      , "./assets/svg/close.svg"       , 24)
           $mdThemingProvider.theme('default')
               .primaryPalette('blue-grey')
               .accentPalette('pink');
